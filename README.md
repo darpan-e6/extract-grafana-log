@@ -1,1 +1,1 @@
-### All descriptions are provided in python script itself
+### All descriptions are provided in example environment file

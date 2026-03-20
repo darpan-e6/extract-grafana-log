@@ -1,29 +1,21 @@
+import os
 import requests
-import json
 import time
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
 
-# This is the hostname that we see in the grafana URL
-GRAFANA_URL = "https://grafana.e6data.cloud"
+load_dotenv()
 
-# Paste your full cookie: "grafana_session=xxx; grafana_session_expiry=xxx", get it by opening developer tools, netwrok tab, open any succeeded query... request, get cookie in request headers 
-BROWSER_COOKIE = "grafana_session=e1e1609f063f32569506d65e15756fd6; grafana_session_expiry=1773895576"
+GRAFANA_URL = os.environ["GRAFANA_URL"]
+BROWSER_COOKIE = os.environ["BROWSER_COOKIE"]
+LOKI_UID = os.environ["LOKI_UID"]
+LOGQL_QUERY = os.environ["LOGQL_QUERY"]
 
-# Get UID from grafana link, there will be one field called datasource in URL, paste the value below.
-LOKI_UID = "b9831d5e-622d-4a07-acf3-e7b91edf6116"
-
-# Your LogQL query
-LOGQL_QUERY = '{alias="freshworks",component="planner",workspace="analytics-us-pre-prod",cluster="soak-test-web-cs"}'
-
-# --- TIME RANGE SETUP ---
-# Add start time here, format is: (Start: 2026-03-18 16:51:50)
-start_dt = datetime(2026, 3, 18, 16, 51, 50)
-
-# Add end time here, format is: (End: 2026-03-19 1:35:59)
-end_dt = datetime(2026, 3, 19, 1, 35, 59)
+start_dt = datetime.strptime(os.environ["START_TIME"], "%Y-%m-%d %H:%M:%S")
+end_dt = datetime.strptime(os.environ["END_TIME"], "%Y-%m-%d %H:%M:%S")
 
 # Since grafana allows only 5000 rows at max, try to fetch logs for smaller window, reduce it if limit of 5000 lines is reached
-WINDOW_SIZE_MINUTES = 5 # Smaller windows prevent hitting result limits
+WINDOW_SIZE_MINUTES = int(os.environ.get("WINDOW_SIZE_MINUTES", 5))
 
 def fetch_all_logs():
     current_start = start_dt
